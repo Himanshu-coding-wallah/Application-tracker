@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Briefcase,
   Clock,
@@ -9,9 +9,26 @@ import {
   PlusIcon,
   GlobeOff
 } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 
 
 const Dashboard = () => {
+    const navigate = useNavigate()
+    let [data, setData] = useState([])
+    let [total, setTotal] = useState(0)
+    const statusCounts = data.reduce((acc, item) => {
+        acc[item.status] = (acc[item.status] || 0) + 1
+        return acc
+    }, {})
+
+    total = data.length
+    
+    useEffect(()=>{
+        const storedData = JSON.parse(localStorage.getItem("applications"))
+        setData(storedData || [])
+    }, [])
+   
+
   return (
     <>
     <div className='ml-64 mt-16 bg-gray-50 p-8'>
@@ -34,7 +51,7 @@ const Dashboard = () => {
                         Total Applications
                     </p>
                     <h2 className="text-2xl font-bold text-gray-800">
-                        24
+                        {total}
                     </h2>
                     </div>
 
@@ -54,7 +71,8 @@ const Dashboard = () => {
                         Interviews
                     </p>
                     <h2 className="text-2xl font-bold text-gray-800">
-                        8
+                        {statusCounts.Interview || 0}
+
                     </h2>
                     </div>
 
@@ -72,10 +90,11 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between mb-4">
                     <div>
                     <p className="text-sm text-gray-500">
-                        Offers
+                    Offers
                     </p>
                     <h2 className="text-2xl font-bold text-gray-800">
-                        3
+                    {statusCounts.Offer || 0}
+
                     </h2>
                     </div>
 
@@ -96,7 +115,8 @@ const Dashboard = () => {
                         Rejected
                     </p>
                     <h2 className="text-2xl font-bold text-gray-800">
-                        4
+                    {statusCounts.Rejected || 0}
+
                     </h2>
                     </div>
 
@@ -117,7 +137,7 @@ const Dashboard = () => {
             {/* first */}
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-800">
-                    Applications Kanban
+                    Applications Overview
                 </h3>
                 <div className="flex items-center gap-4">
                     <div className="relative">
@@ -131,7 +151,8 @@ const Dashboard = () => {
                             className="w-64 pl-10 pr-4 py-2 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                         />
                     </div>
-                    <button className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
+                    <button className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
+                    onClick={()=>(navigate("add"))}>
                     <Plus size={16} />
                     Add Application
                     </button>
@@ -140,146 +161,284 @@ const Dashboard = () => {
 
             {/* second */}
             <div className='grid grid-cols-5 gap-3'>
-                <div className="bg-white rounded-xl shadow-sm p-4 h-80 flex flex-col justify-between ">
+                {/* applied section */}
+                <div className="bg-white rounded-xl shadow-sm p-4 h-80 flex flex-col  ">
                     <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
+                        <div className="flex  items-center gap-2 ">
                             <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                             <p className="text-sm font-semibold text-gray-700">
                                 Applied
                             </p>
                         </div>
                         <div className="w-8 h-8 bg-gray-100 text-gray-700 text-sm font-medium rounded-full flex items-center justify-center">
-                        10
+                        {statusCounts.Applied || 0}
                         </div>
                     </div>
+                    <div className='no-scrollbar overflow-auto'>
+                        {data.filter(item => item.status === "Applied")
+                        .map((item, index) => (
+                            <div
+                            key={index}
+                            className="bg-white p-4 mb-2 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                            >
+                            {/* Top Section */}
+                            <div className="flex items-start gap-3">
 
-                    <div className="flex-1 space-y-3 overflow-y-auto no-scrollbar pr-1">
-                        <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:-translate-y-1 hover:shadow-md transition-all duration-200 cursor-pointer flex gap-4 items-start">
+                                {/* Company Avatar */}
+                                <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-semibold text-sm">
+                                {item.company?.charAt(0).toUpperCase()}
+                                </div>
 
-                            <div className="w-16 h-10 flex items-center justify-center rounded-lg bg-gray-50 border border-gray-200">
-                                <img
-                                src="https://www.svgrepo.com/show/475656/google-color.svg"
-                                alt="Google"
-                                className="w-5 h-5"
-                                />
+                                {/* Job Info */}
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-semibold text-gray-900">
+                                        {item.company}
+                                    </h4>
+                                    <p className="text-sm text-gray-600">
+                                        {item.position}
+                                    </p>
+
+                                    {/* Tags */}
+                                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                        <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full font-medium">
+                                        {item.type}
+                                        </span>
+
+                                        <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full font-medium">
+                                        {item.location}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-
-                            <div className="flex flex-col items-start gap-1">
-                                <h4 className="text-sm font-semibold text-gray-900 ">
-                                Google
-                                </h4>
-                                <p className="text-sm text-gray-600">
-                                Frontend Developer
-                                </p>
-                                <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full font-medium">
-                                Remote
-                                </span>
                             </div>
-                        </div>
+                        ))}
                     </div>
-
-                    <button className="mt-4 flex items-center justify-center gap-2 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 py-2 rounded-lg transition">
-                        <Plus size={16} />
-                        Add Application
-                    </button>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm p-4 min-h-80">
+
+                {/* interview section */}
+                <div className="bg-white rounded-xl shadow-sm p-4 h-80 flex flex-col ">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 bg-yellow-600 rounded-full"></span>
+                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                             <p className="text-sm font-semibold text-gray-700">
                                 Interview
                             </p>
                         </div>
                         <div className="w-8 h-8 bg-gray-100 text-gray-700 text-sm font-medium rounded-full flex items-center justify-center">
-                        4
+                        {statusCounts.Interview || 0}
                         </div>
                     </div>
+                    <div className='no-scrollbar overflow-auto'>
+                        {data.filter(item => item.status === "Interview")
+                        .map((item, index) => (
+                            <div
+                            key={index}
+                            className="bg-white p-4 mb-2 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                            >
+                            {/* Top Section */}
+                            <div className="flex items-start gap-3">
 
-                    <div className="space-y-3">
-                        <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 shadow-sm">
-                        Company Name
-                        </div>
-                        <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 shadow-sm">
-                        Another Company
-                        </div>
+                                {/* Company Avatar */}
+                                <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-semibold text-sm">
+                                {item.company?.charAt(0).toUpperCase()}
+                                </div>
+
+                                {/* Job Info */}
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-semibold text-gray-900">
+                                        {item.company}
+                                    </h4>
+                                    <p className="text-sm text-gray-600">
+                                        {item.position}
+                                    </p>
+
+                                    {/* Tags */}
+                                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                        <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full font-medium">
+                                        {item.type}
+                                        </span>
+
+                                        <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full font-medium">
+                                        {item.location}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm p-4 min-h-80">
+
+                {/* pending section  */}
+                <div className="bg-white rounded-xl shadow-sm p-4 h-80 flex flex-col  ">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 bg-purple-600 rounded-full"></span>
+                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                             <p className="text-sm font-semibold text-gray-700">
                                 Pending
                             </p>
                         </div>
                         <div className="w-8 h-8 bg-gray-100 text-gray-700 text-sm font-medium rounded-full flex items-center justify-center">
-                        2
+                        {statusCounts.Pending || 0}
                         </div>
                     </div>
+                    <div className='no-scrollbar overflow-auto'>
+                        {data.filter(item => item.status === "Pending")
+                        .map((item, index) => (
+                            <div
+                            key={index}
+                            className="bg-white p-4 mb-2 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                            >
+                            {/* Top Section */}
+                            <div className="flex items-start gap-3">
 
-                    <div className="space-y-3">
-                        <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 shadow-sm">
-                        Company Name
-                        </div>
-                        <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 shadow-sm">
-                        Another Company
-                        </div>
+                                {/* Company Avatar */}
+                                <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-semibold text-sm">
+                                {item.company?.charAt(0).toUpperCase()}
+                                </div>
+
+                                {/* Job Info */}
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-semibold text-gray-900">
+                                        {item.company}
+                                    </h4>
+                                    <p className="text-sm text-gray-600">
+                                        {item.position}
+                                    </p>
+
+                                    {/* Tags */}
+                                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                        <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full font-medium">
+                                        {item.type}
+                                        </span>
+
+                                        <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full font-medium">
+                                        {item.location}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm p-4 min-h-80">
+
+                {/* rejected section  */}
+                <div className="bg-white rounded-xl shadow-sm p-4 h-80 flex flex-col ">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                             <p className="text-sm font-semibold text-gray-700">
                                 Rejected
                             </p>
                         </div>
                         <div className="w-8 h-8 bg-gray-100 text-gray-700 text-sm font-medium rounded-full flex items-center justify-center">
-                        10
+                        {statusCounts.Rejected || 0}
                         </div>
                     </div>
+                    <div className='no-scrollbar overflow-auto'>
+                        {data.filter(item => item.status === "Rejected")
+                        .map((item, index) => (
+                            <div
+                            key={index}
+                            className="bg-white p-4 mb-2 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                            >
+                            {/* Top Section */}
+                            <div className="flex items-start gap-3">
 
-                    <div className="space-y-3">
-                        <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 shadow-sm">
-                        Company Name
-                        </div>
-                        <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 shadow-sm">
-                        Another Company
-                        </div>
+                                {/* Company Avatar */}
+                                <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-semibold text-sm">
+                                {item.company?.charAt(0).toUpperCase()}
+                                </div>
+
+                                {/* Job Info */}
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-semibold text-gray-900">
+                                        {item.company}
+                                    </h4>
+                                    <p className="text-sm text-gray-600">
+                                        {item.position}
+                                    </p>
+
+                                    {/* Tags */}
+                                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                        <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full font-medium">
+                                        {item.type}
+                                        </span>
+
+                                        <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full font-medium">
+                                        {item.location}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
-                <div className="bg-white rounded-xl shadow-sm p-4 min-h-80">
+                
+                {/* offer section  */}
+                <div className="bg-white rounded-xl shadow-sm p-4 h-80 flex flex-col ">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                            <span className="w-2 h-2 bg-green-700 rounded-full"></span>
+                            <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                             <p className="text-sm font-semibold text-gray-700">
                                 Offer
                             </p>
                         </div>
                         <div className="w-8 h-8 bg-gray-100 text-gray-700 text-sm font-medium rounded-full flex items-center justify-center">
-                        3
+                        {statusCounts.Offer || 0}
                         </div>
                     </div>
+                    <div className='no-scrollbar overflow-auto'>
+                        {data.filter(item => item.status === "Offer")
+                        .map((item, index) => (
+                            <div
+                            key={index}
+                            className="bg-white p-4 mb-2 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                            >
+                            {/* Top Section */}
+                            <div className="flex items-start gap-3">
 
-                    <div className="space-y-3">
-                        <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 shadow-sm">
-                        Company Name
-                        </div>
-                        <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-600 shadow-sm">
-                        Another Company
-                        </div>
+                                {/* Company Avatar */}
+                                <div className="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-semibold text-sm">
+                                {item.company?.charAt(0).toUpperCase()}
+                                </div>
+
+                                {/* Job Info */}
+                                <div className="flex-1">
+                                    <h4 className="text-sm font-semibold text-gray-900">
+                                        {item.company}
+                                    </h4>
+                                    <p className="text-sm text-gray-600">
+                                        {item.position}
+                                    </p>
+
+                                    {/* Tags */}
+                                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                                        <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full font-medium">
+                                        {item.type}
+                                        </span>
+
+                                        <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full font-medium">
+                                        {item.location}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </div>
         </div>
 
         {/* ======== third section ======== */}
-        <div>
+        {/* <div>
             <div>1</div>
             <div>2</div>
             <div>3</div>
-        </div>
+        </div> */}
     </div>
 
     </>

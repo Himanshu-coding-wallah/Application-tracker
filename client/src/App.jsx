@@ -1,22 +1,20 @@
-import { BrowserRouter } from "react-router-dom"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
 import SideBar from "./components/Sidebar"
 import Navbar from "./components/Navbar"
 import Dashboard from "./components/Dashboard"
-
+import AddApplication from "./components/AddApplication"
+import Layout from "./components/Layout"
 
 function App(){
   return( 
   <>
     <BrowserRouter>
-      <div className="flex">
-        <div>
-          <SideBar/>
-        </div>
-        <div className="w-full">
-          <Navbar/>
-          <Dashboard/>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="add" element={<AddApplication />} />
+        </Route>
+      </Routes>
     </BrowserRouter>
   </>
   )
