@@ -6,6 +6,7 @@ import AddApplication from "./components/AddApplication"
 import Layout from "./components/Layout"
 import Applications from "./components/Applications"
 import History from "./components/History"
+import Settings from "./components/Settings"
 
 function App(){
   return( 
@@ -17,6 +18,7 @@ function App(){
           <Route path="add" element={<AddApplication />} />
           <Route path="applications" element={<Applications />} />
           <Route path="history" element={<History />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>

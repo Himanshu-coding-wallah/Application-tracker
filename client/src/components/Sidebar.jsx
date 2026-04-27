@@ -128,11 +128,11 @@ const SideBar = () => {
       </div>
 
       {/* Bottom Profile */}
-      <div className="flex items-center gap-3 bg-slate-800 p-3 rounded-lg">
-        <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-semibold">
+      <div className="flex items-center gap-3 bg-slate-800 p-3 rounded-lg" >
+        <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center font-semibold cursor-pointer" onClick={()=>navigate("settings")}>
           H
         </div>
-        <div>
+        <div onClick={()=>navigate("settings")} className="cursor-pointer">
           <p className="text-sm font-medium">Himanshu</p>
           <p className="text-xs text-gray-400">Frontend Dev</p>
         </div>

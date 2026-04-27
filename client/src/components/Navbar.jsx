@@ -47,8 +47,8 @@ const Navbar = () => {
         </div>
 
         {/* Profile */}
-        <div className="flex items-center gap-3 cursor-pointer">
-          <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-medium">
+        <div className="flex items-center gap-3 cursor-pointer" onClick={()=>navigate("settings")}>
+          <div className="w-9 h-9 rounded-full bg-indigo-600 text-white flex items-center justify-center font-medium" >
             H
           </div>
           <h2 className="text-sm font-semibold text-gray-700">
