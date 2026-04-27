@@ -14,8 +14,11 @@ import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
     const navigate = useNavigate()
+
+    const [selectedItem, setSelectedItem] = useState(null)
     let [data, setData] = useState([])
     let [total, setTotal] = useState(0)
+
     const statusCounts = data.reduce((acc, item) => {
         acc[item.status] = (acc[item.status] || 0) + 1
         return acc
@@ -26,12 +29,13 @@ const Dashboard = () => {
     useEffect(()=>{
         const storedData = JSON.parse(localStorage.getItem("applications"))
         setData(storedData || [])
+        const deleted = JSON.parse(localStorage.getItem("deletedApplications")) || []
     }, [])
    
 
   return (
     <>
-    <div className='ml-64 mt-16 bg-gray-50 p-8'>
+    <div className='ml-64 mt-16 bg-gray-50 p-8 '>
         {/* ========= first section ======== */}
         <div className="mb-10">
             <div className="mb-8">
@@ -134,13 +138,13 @@ const Dashboard = () => {
 
         {/* ======= second section ======== */}
         <div>
-            {/* first */}
+            {/*  second > first */}
             <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-gray-800">
                     Applications Overview
                 </h3>
                 <div className="flex items-center gap-4">
-                    <div className="relative">
+                    {/* <div className="relative">
                         <Search
                             size={18}
                             className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
@@ -148,9 +152,10 @@ const Dashboard = () => {
                         <input
                             type="text"
                             placeholder="Search applications..."
+                            onChange={()=>(navigate("applications"))}
                             className="w-64 pl-10 pr-4 py-2 rounded-lg border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
                         />
-                    </div>
+                    </div> */}
                     <button className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition"
                     onClick={()=>(navigate("add"))}>
                     <Plus size={16} />
@@ -159,7 +164,7 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* second */}
+            {/* second > second */}
             <div className='grid grid-cols-5 gap-3'>
                 {/* applied section */}
                 <div className="bg-white rounded-xl shadow-sm p-4 h-80 flex flex-col  ">
@@ -179,6 +184,7 @@ const Dashboard = () => {
                         .map((item, index) => (
                             <div
                             key={index}
+                            onClick={()=>(setSelectedItem(item))}
                             className="bg-white p-4 mb-2 rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 cursor-pointer"
                             >
                             {/* Top Section */}
@@ -211,6 +217,7 @@ const Dashboard = () => {
                                 </div>
                             </div>
                             </div>
+                            
                         ))}
                     </div>
                 </div>
@@ -432,6 +439,92 @@ const Dashboard = () => {
                 </div>
             </div>
         </div>
+
+
+        {selectedItem && (
+            <div
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                onClick={() => setSelectedItem(null)}
+            >   
+                <div
+                className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 relative animate-fadeIn"
+                onClick={(e) => e.stopPropagation()}
+                >
+
+                {/* Company */}
+                <h2 className="text-2xl font-bold text-gray-800 mb-1">
+                    {selectedItem.company}
+                </h2>
+
+                <p className="text-gray-500 mb-6">
+                    {selectedItem.position}
+                </p>
+
+                {/* Details Section */}
+                <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                    <span className="text-gray-500">Status</span>
+                    <span className="font-medium text-blue-600">
+                        {selectedItem.status}
+                    </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                    <span className="text-gray-500">Location</span>
+                    <span className="font-medium">
+                        {selectedItem.location}
+                    </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                    <span className="text-gray-500">Salary</span>
+                    <span className="font-medium">
+                        {selectedItem.currency}{selectedItem.salary}
+                    </span>
+                    </div>
+
+                    <div className="flex justify-between">
+                    <span className="text-gray-500">Job Type</span>
+                    <span className="font-medium">
+                        {selectedItem.type}
+                    </span>
+                    </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-3 mt-8">
+                    <button
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition"
+                    onClick={() => setSelectedItem(null)}
+                    >
+                    Close
+                    </button>
+
+                    <button
+                    className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg transition shadow-md"
+                    onClick={() => {
+                        const stored =
+                        JSON.parse(localStorage.getItem("applications")) || []
+
+                        const updated = stored.filter(
+                        (items) => items.id !== selectedItem.id
+                        )
+                        const toBeDeleted = stored.filter(
+                        (items) => items.id === selectedItem.id
+                        )
+                        localStorage.setItem("deletedApplications",JSON.stringify(toBeDeleted))
+
+                        setData(updated)
+                        localStorage.setItem("applications",JSON.stringify(updated))
+                        setSelectedItem(null)
+                    }}
+                    >
+                    Delete
+                    </button>
+                </div>
+                </div>
+            </div>
+        )}
 
         {/* ======== third section ======== */}
         {/* <div>

@@ -5,6 +5,7 @@ const AddApplication = () => {
   const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
+    id: Date.now(),
     company: "",
     position: "",
     type: "",
