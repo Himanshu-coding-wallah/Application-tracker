@@ -7,13 +7,15 @@ import Layout from "./components/Layout"
 import Applications from "./components/Applications"
 import History from "./components/History"
 import Settings from "./components/Settings"
+import Home from "./components/Home"
 
 function App(){
   return( 
   <>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path= "/" element={<Home/>} />
+        <Route path="/dashboard" element={<Layout />}>
           <Route index element={<Dashboard />} />
           <Route path="add" element={<AddApplication />} />
           <Route path="applications" element={<Applications />} />
