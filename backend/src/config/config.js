@@ -1,17 +1,16 @@
 import dotenv from "dotenv"
 dotenv.config()
 
-if(!process.env.MONGO_URI){
-    throw new Error("Mongo uri not found")
+if(! process.env.JWT_SECRET){
+    throw new Error("jwt secret is not defined")
 }
-
-if(!process.env.JWT_SECRET){
-    throw new Error("JWT secret not found")
+if(! process.env.MONGO_URI){
+    throw new Error("mongo uri is not defined")
 }
 
 const config = {
-    MONGO_URI: process.env.MONGO_URI,
-    JWT_SECRET: process.env.JWT_SECRET
+    JWT_SECRET: process.env.JWT_SECRET,
+    MONGO_URI: process.env.MONGO_URI
 }
 
 export default config
